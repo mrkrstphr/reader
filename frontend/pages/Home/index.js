@@ -8,6 +8,8 @@ const fetchRecentlyAddedIssues = gql`
       id
       name
       hasCover
+      currentPage
+      pageCount
     }
   }
 `;
@@ -28,12 +30,14 @@ function Issue({ progress, issue }) {
             backgroundImage: issue.hasCover ? `url(cover/${issue.id})` : 'none',
           }}
         >
-          {progress && (
+          {issue.currentPage > 1 && (
             <>
               <div className="absolute h-1 bg-gray-500 bg-opacity-50 bottom-0 w-full" />
               <div
                 className="absolute h-1 bg-indigo-500 bottom-0"
-                style={{ width: `${progress}%` }}
+                style={{
+                  width: `${(issue.currentPage / issue.pageCount) * 100}%`,
+                }}
               />
             </>
           )}

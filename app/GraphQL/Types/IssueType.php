@@ -3,6 +3,7 @@
 namespace App\GraphQL\Types;
 
 use App\Models\Issue;
+use App\Models\UserIssueReadProgress;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Type as GraphQLType;
 
@@ -37,6 +38,22 @@ class IssueType extends GraphQLType
                 'description' => 'Number of pages in this issue',
                 'resolve' => function ($root) {
                     return $root->page_count;
+                },
+            ],
+            'currentPage' => [
+                'type' => Type::nonNull(Type::int()),
+                'description' => 'The page number the user is currently on',
+                'resolve' => function ($root) {
+                    $TODO_FIXME_HARD_CODED_USER_ID = 1;
+                    $progress = UserIssueReadProgress::where('user_id', $TODO_FIXME_HARD_CODED_USER_ID)
+                        ->where('issue_id', $root->id)
+                        ->first();
+
+                    if ($progress) {
+                        return $progress->current_page;
+                    }
+
+                    return 1;
                 },
             ],
         ];

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\GraphQL\Mutations\SaveReadingProgressMutation;
 use App\GraphQL\Queries\IssueDetailsQuery;
 use App\GraphQL\Queries\RecentlyAddedIssuesQuery;
 use App\GraphQL\Types\IssueType;
@@ -70,6 +71,7 @@ return [
                 'recentlyAddedIssues' => RecentlyAddedIssuesQuery::class,
             ],
             'mutation' => [
+                'saveReadingProgress' => SaveReadingProgressMutation::class,
                 // 'example_mutation'  => ExampleMutation::class,
             ],
             'middleware' => [],

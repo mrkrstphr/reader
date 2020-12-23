@@ -9,6 +9,7 @@ const fetchIssueDetails = gql`
       id
       name
       hasCover
+      currentPage
       pageCount
     }
   }

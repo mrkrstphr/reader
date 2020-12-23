@@ -1,6 +1,6 @@
-import { gql, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { isNil } from 'lodash';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useHistory, useParams } from 'react-router';
 import { Icon } from '../../Icon';
 
@@ -11,6 +11,7 @@ const fetchIssueDetails = gql`
       name
       hasCover
       pageCount
+      currentPage
     }
   }
 `;
@@ -57,6 +58,21 @@ function useFetchThumbnail(issue, page) {
   };
 }
 
+const saveProgressMutation = gql`
+  mutation saveReadingProgress($id: ID!, $page: Int!) {
+    saveReadingProgress(id: $id, page: $page) {
+      id
+      currentPage
+    }
+  }
+`;
+
+function useSaveProgress(issueId) {
+  const [saveProgress] = useMutation(saveProgressMutation);
+
+  return pageNum => saveProgress({ variables: { id: issueId, page: pageNum } });
+}
+
 function Thumbnail({ issue, onClick, page }) {
   const { thumbnail } = useFetchThumbnail(issue, page);
   return thumbnail ? (
@@ -69,19 +85,25 @@ function Thumbnail({ issue, onClick, page }) {
   ) : null;
 }
 
-export default function IssueReaderPage() {
-  const { id } = useParams();
-  const history = useHistory();
-  const { issue } = useIssueDetails(id);
-  const [page, setPage] = useState(1);
+function Reader({ issue }) {
+  const saveProgress = useSaveProgress(issue.id);
   const [isOverlayActive, setIsOverlayActive] = useState(true);
+  const [page, setPage] = useState(issue.currentPage);
   const { currentPage } = useFetchPages(issue, page);
-  const viewerRef = React.useRef(null);
+  const viewerRef = useRef(null);
+  const history = useHistory();
+
   useEffect(() => {
     if (viewerRef.current) {
       viewerRef.current.focus();
     }
   }, [viewerRef.current]);
+
+  useEffect(() => {
+    if (issue && issue.currentPage !== page) {
+      saveProgress(page);
+    }
+  }, [page]);
 
   function onClick(e) {
     const { x: positionX, width } = e.target.getBoundingClientRect();
@@ -107,33 +129,13 @@ export default function IssueReaderPage() {
         break;
 
       case 'escape':
-        history.push(`/issue/${id}/details`);
-        break;
-
-      default:
-        console.log(e.key);
+        history.push(`/issue/${issue.id}/details`);
         break;
     }
   }
 
   return (
     <div>
-      <h1>ISSUE READER VIEW</h1>
-      {/* <pre>{JSON.stringify(issue, null, 2)}</pre> */}
-
-      <div>
-        <button
-          className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          type="button"
-          onClick={() => {
-            setPage(Math.min(page + 1, issue.pageCount));
-          }}
-          disabled={isNil(issue) || page === issue.pageCount}
-        >
-          Next
-        </button>
-      </div>
-
       {/* {currentPage && <img alt="" src={currentPage} />} */}
 
       {/* <div className="flex space-x-2">
@@ -141,19 +143,19 @@ export default function IssueReaderPage() {
     </div> */}
 
       <div
-        class="fixed z-10 inset-0 overflow-y-auto"
+        className="fixed z-10 inset-0 overflow-y-auto"
         ref={viewerRef}
         onClick={onClick}
         onKeyUp={onKeyPress}
         tabIndex={0}
       >
-        <div class="flex items-end justify-center min-h-screen text-center">
-          <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-            <div class="absolute inset-0 bg-black"></div>
+        <div className="flex items-end justify-center min-h-screen text-center">
+          <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div className="absolute inset-0 bg-black"></div>
           </div>
 
           <span
-            class="hidden sm:inline-block sm:align-middle sm:h-screen"
+            className="hidden sm:inline-block sm:align-middle sm:h-screen"
             aria-hidden="true"
           >
             &#8203;
@@ -174,7 +176,7 @@ export default function IssueReaderPage() {
                   className="text-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   onClick={e => {
                     e.stopPropagation();
-                    history.push(`/issue/${id}/details`);
+                    history.push(`/issue/${issue.id}/details`);
                   }}
                 />
               </div>
@@ -192,6 +194,12 @@ export default function IssueReaderPage() {
                     )}
                   </span>
                 </div>
+                <div
+                  className="bg-indigo-500 h-2 mt-2 rounded-sm"
+                  style={{
+                    width: `${(issue.currentPage / issue.pageCount) * 100}%`,
+                  }}
+                />
               </div>
             )}
           </div>
@@ -199,4 +207,16 @@ export default function IssueReaderPage() {
       </div>
     </div>
   );
+}
+
+export default function IssueReaderPage() {
+  const { id } = useParams();
+  const { issue } = useIssueDetails(id);
+
+  if (!issue) {
+    // TODO FIXME loading graphic
+    return null;
+  }
+
+  return <Reader issue={issue} />;
 }
