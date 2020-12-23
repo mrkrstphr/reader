@@ -3,48 +3,53 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const fetchRecentlyAddedIssues = gql`
-{
-  recentlyAddedIssues {
-    id
-    name
-    hasCover
+  {
+    recentlyAddedIssues {
+      id
+      name
+      hasCover
+    }
   }
-}
 `;
 
 function useRecentlyAddedIssues() {
-  const {data, ...etc} = useQuery(fetchRecentlyAddedIssues);
+  const { data, ...etc } = useQuery(fetchRecentlyAddedIssues);
 
-  return {issues: data?.recentlyAddedIssues, ...etc};
+  return { issues: data?.recentlyAddedIssues, ...etc };
 }
 
 function Issue({ progress, issue }) {
   return (
     <Link to={`/issue/${issue.id}/details`}>
-    <div className="w-32 mr-2">
-      <div className="h-48 w-32 bg-gray-300 hover:bg-gray-400 cursor-pointer rounded-sm shadow relative bg-contain bg-no-repeat" style={{backgroundImage: issue.hasCover ? `url(cover/${issue.id})` : 'none'}}>
-      {progress && (
-        <>
-          <div className="absolute h-1 bg-gray-500 bg-opacity-50 bottom-0 w-full" />
-          <div className="absolute h-1 bg-indigo-500 bottom-0" style={{width: `${progress}%`}} />
-        </>
-      )}
+      <div className="w-32 mr-2">
+        <div
+          className="h-48 w-32 bg-gray-300 hover:bg-gray-400 cursor-pointer rounded-sm shadow relative bg-contain bg-no-repeat"
+          style={{
+            backgroundImage: issue.hasCover ? `url(cover/${issue.id})` : 'none',
+          }}
+        >
+          {progress && (
+            <>
+              <div className="absolute h-1 bg-gray-500 bg-opacity-50 bottom-0 w-full" />
+              <div
+                className="absolute h-1 bg-indigo-500 bottom-0"
+                style={{ width: `${progress}%` }}
+              />
+            </>
+          )}
+        </div>
+        <div className="text-sm mt-2">{issue.name}</div>
       </div>
-      <div className="text-sm mt-2">
-        {issue.name}
-      </div>
-    </div>
     </Link>
-  )
+  );
 }
 
 export default function HomePage() {
-  const {issues: recentlyAddedIssues} = useRecentlyAddedIssues();
+  const { issues: recentlyAddedIssues } = useRecentlyAddedIssues();
 
   return (
     <div>
-
-<h1 className="text-2xl font-semibold text-gray-900">Home</h1>
+      <h1 className="text-2xl font-semibold text-gray-900">Home</h1>
 
       <div className="mb-8">
         <div className="font-heavy mb-3">Continue Reading</div>
@@ -74,5 +79,5 @@ export default function HomePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

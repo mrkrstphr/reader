@@ -4,22 +4,22 @@ import { gql, useQuery } from '@apollo/client';
 import { isNil } from 'lodash';
 
 const fetchIssueDetails = gql`
-query fetchIssue($id: ID!) {
-  issue(id: $id) {
-    id
-    name
-    hasCover
-    pageCount
+  query fetchIssue($id: ID!) {
+    issue(id: $id) {
+      id
+      name
+      hasCover
+      pageCount
+    }
   }
-}
 `;
 
 function useIssueDetails(id) {
-  const {data, ...etc} = useQuery(fetchIssueDetails, {
+  const { data, ...etc } = useQuery(fetchIssueDetails, {
     variables: { id },
   });
 
-  return {issue: data?.issue, ...etc};
+  return { issue: data?.issue, ...etc };
 }
 
 export default function IssueDetails() {
@@ -41,9 +41,7 @@ export default function IssueDetails() {
         >
           Read
         </Link>
-        </div>
-
+      </div>
     </div>
-  )
-
+  );
 }
