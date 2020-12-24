@@ -2,6 +2,24 @@ import { gql, useQuery } from '@apollo/client';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+const fetchContinueReading = gql`
+  {
+    currentlyReading {
+      id
+      name
+      hasCover
+      currentPage
+      pageCount
+    }
+  }
+`;
+
+function useCurrentlyReading() {
+  const { data, ...etc } = useQuery(fetchContinueReading);
+
+  return { issues: data?.currentlyReading, ...etc };
+}
+
 const fetchRecentlyAddedIssues = gql`
   {
     recentlyAddedIssues {
@@ -20,7 +38,7 @@ function useRecentlyAddedIssues() {
   return { issues: data?.recentlyAddedIssues, ...etc };
 }
 
-function Issue({ progress, issue }) {
+function Issue({ issue }) {
   return (
     <Link to={`/issue/${issue.id}/details`}>
       <div className="w-32 mr-2">
@@ -49,6 +67,7 @@ function Issue({ progress, issue }) {
 }
 
 export default function HomePage() {
+  const { issues: currentlyReading } = useCurrentlyReading();
   const { issues: recentlyAddedIssues } = useRecentlyAddedIssues();
 
   return (
@@ -58,10 +77,9 @@ export default function HomePage() {
       <div className="mb-8">
         <div className="font-heavy mb-3">Continue Reading</div>
         <div className="flex flex-wrap">
-          {/* <Issue title="Green Lantern (2005) #19" progress={70} />
-          <Issue title="Green Lantern Corps (2006) #6" progress={40} />
-          <Issue title="JLA (1999) #3" progress={40} />
-          <Issue title="The Walking Dead (2003) #118" progress={5} /> */}
+          {(currentlyReading || []).map(issue => (
+            <Issue key={`currently-reading-${issue.id}`} issue={issue} />
+          ))}
         </div>
       </div>
 

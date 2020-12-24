@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\GraphQL\Mutations\SaveReadingProgressMutation;
+use App\GraphQL\Queries\CurrentlyReadingQuery;
 use App\GraphQL\Queries\IssueDetailsQuery;
 use App\GraphQL\Queries\RecentlyAddedIssuesQuery;
 use App\GraphQL\Types\IssueType;
@@ -67,6 +68,7 @@ return [
     'schemas' => [
         'default' => [
             'query' => [
+                'currentlyReading' => CurrentlyReadingQuery::class,
                 'issue' => IssueDetailsQuery::class,
                 'recentlyAddedIssues' => RecentlyAddedIssuesQuery::class,
             ],
