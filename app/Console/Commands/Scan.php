@@ -49,7 +49,8 @@ class Scan extends Command
      */
     public function handle()
     {
-        $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('/Volumes/Books/Comics'));
+        // TODO FIXME hard coded path
+        $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('/books'));
 
         $files = array();
 
