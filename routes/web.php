@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\PeopleController;
 use App\Models\Issue;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
@@ -16,10 +15,6 @@ use Intervention\Image\ImageManagerStatic as Image;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-// Route::get('/', function () {
-//     return view('welcome');
-// });
 
 Route::get('/cover/{id}', function ($id) {
     $issue = Issue::findOrFail($id);
@@ -60,7 +55,8 @@ Route::get('/issue/{id}/page/{pageNum}', function ($id, $pageNum) {
     // var_dump($relevantFiles);
 
     if (count($relevantFiles) >= $pageNum) {
-        return stream_get_contents($zip->getStream($relevantFiles[$pageNum - 1]));
+        return Image::make($zip->getStream($relevantFiles[$pageNum - 1]))->response();
+        // return stream_get_contents($zip->getStream($relevantFiles[$pageNum - 1]));
     }
 
     return new Response('', Response::HTTP_NOT_FOUND);

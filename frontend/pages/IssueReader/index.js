@@ -134,6 +134,11 @@ function Reader({ issue }) {
     }
   }
 
+  if (!currentPage) {
+    // TODO FIXME loading graphic?
+    return null;
+  }
+
   return (
     <div>
       {/* {currentPage && <img alt="" src={currentPage} />} */}

@@ -49,8 +49,7 @@ class Scan extends Command
      */
     public function handle()
     {
-        // TODO FIXME hard coded path
-        $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('/books'));
+        $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(env('BOOK_PATH')));
 
         $files = array();
 
@@ -110,9 +109,8 @@ class Scan extends Command
 
                 $coverImageName = $relevantFiles[0];
                 $coverImage = stream_get_contents($zip->getStream($coverImageName));
-                $storageFileName = getcwd() . '/storage/covers/' . $issueFolder . '/' . $issue->id . substr($coverImageName, strrpos($coverImageName, '.'));
-
-// echo $storageFileName . "\n";
+                $storageFileName = rtrim(env('COVER_AND_META_PATH'), '/') . '/' . $issueFolder . '/' . $issue->id .
+                    substr($coverImageName, strrpos($coverImageName, '.'));
 
                 if (!file_exists(dirname($storageFileName))) {
                     mkdir(dirname($storageFileName));
