@@ -1,12 +1,13 @@
 import { gql, useQuery } from '@apollo/client';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { BrowserTitle } from '../../components';
 
 const fetchContinueReading = gql`
   {
     currentlyReading {
       id
-      name
+      title
       hasCover
       currentPage
       pageCount
@@ -24,7 +25,7 @@ const fetchRecentlyAddedIssues = gql`
   {
     recentlyAddedIssues {
       id
-      name
+      title
       hasCover
       currentPage
       pageCount
@@ -43,7 +44,7 @@ function Issue({ issue }) {
     <Link to={`/issue/${issue.id}/details`}>
       <div className="w-32 mr-2">
         <div
-          className="h-48 w-32 bg-gray-300 hover:bg-gray-400 cursor-pointer rounded-sm shadow relative bg-contain bg-no-repeat"
+          className="h-48 w-32 cursor-pointer rounded-sm relative bg-contain bg-no-repeat"
           style={{
             backgroundImage: issue.hasCover ? `url(cover/${issue.id})` : 'none',
           }}
@@ -60,7 +61,7 @@ function Issue({ issue }) {
             </>
           )}
         </div>
-        <div className="text-sm mt-2">{issue.name}</div>
+        <div className="text-sm mt-2">{issue.title}</div>
       </div>
     </Link>
   );
@@ -72,6 +73,7 @@ export default function HomePage() {
 
   return (
     <div>
+      <BrowserTitle title="" />
       <h1 className="text-2xl font-semibold text-gray-900">Home</h1>
 
       <div className="mb-8">

@@ -18,6 +18,22 @@ class IssueType extends GraphQLType
     public function fields(): array
     {
         return [
+            'currentPage' => [
+                'type' => Type::nonNull(Type::int()),
+                'description' => 'The page number the user is currently on',
+                'resolve' => function ($root) {
+                    $TODO_FIXME_HARD_CODED_USER_ID = 1;
+                    $progress = UserIssueReadProgress::where('user_id', $TODO_FIXME_HARD_CODED_USER_ID)
+                        ->where('issue_id', $root->id)
+                        ->first();
+
+                    if ($progress) {
+                        return $progress->current_page;
+                    }
+
+                    return 1;
+                },
+            ],
             'id' => [
                 'type' => Type::nonNull(Type::string()),
                 'description' => 'The id of the issue',
@@ -40,20 +56,11 @@ class IssueType extends GraphQLType
                     return $root->page_count;
                 },
             ],
-            'currentPage' => [
-                'type' => Type::nonNull(Type::int()),
-                'description' => 'The page number the user is currently on',
+            'title' => [
+                'type' => Type::nonNull(Type::string()),
+                'description' => 'The title of this issue',
                 'resolve' => function ($root) {
-                    $TODO_FIXME_HARD_CODED_USER_ID = 1;
-                    $progress = UserIssueReadProgress::where('user_id', $TODO_FIXME_HARD_CODED_USER_ID)
-                        ->where('issue_id', $root->id)
-                        ->first();
-
-                    if ($progress) {
-                        return $progress->current_page;
-                    }
-
-                    return 1;
+                    return $root->name;
                 },
             ],
         ];

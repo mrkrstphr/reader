@@ -8,7 +8,7 @@ const fetchIssueDetails = gql`
   query fetchIssue($id: ID!) {
     issue(id: $id) {
       id
-      name
+      title
       hasCover
       pageCount
       currentPage
