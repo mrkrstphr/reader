@@ -46,7 +46,9 @@ function Issue({ issue }) {
         <div
           className="h-48 w-32 cursor-pointer rounded-sm relative bg-contain bg-no-repeat"
           style={{
-            backgroundImage: issue.hasCover ? `url(cover/${issue.id})` : 'none',
+            backgroundImage: issue.hasCover
+              ? `url(assets/cover/${issue.id})`
+              : 'none',
           }}
         >
           {issue.currentPage > 1 && (

@@ -29,7 +29,7 @@ function useFetchPages(issue, page) {
 
   useEffect(() => {
     if (issue && page <= issue.pageCount) {
-      fetch(`/issue/${issue.id}/page/${page}`)
+      fetch(`/assets/issue/${issue.id}/page/${page}`)
         .then(body => body.blob())
         .then(img => URL.createObjectURL(img))
         .then(setCurrentPage);
@@ -46,7 +46,7 @@ function useFetchThumbnail(issue, page) {
 
   useEffect(() => {
     if (issue && page <= issue.pageCount) {
-      fetch(`/issue/${issue.id}/page/${page}/thumbnail`)
+      fetch(`/assets/issue/${issue.id}/page/${page}/thumbnail`)
         .then(body => body.blob())
         .then(img => URL.createObjectURL(img))
         .then(setThumbnail);
@@ -73,17 +73,17 @@ function useSaveProgress(issueId) {
   return pageNum => saveProgress({ variables: { id: issueId, page: pageNum } });
 }
 
-function Thumbnail({ issue, onClick, page }) {
-  const { thumbnail } = useFetchThumbnail(issue, page);
-  return thumbnail ? (
-    <img
-      alt={`Thumbnail ${page}`}
-      src={thumbnail}
-      className="h-36 cursor-pointer"
-      onClick={onClick}
-    />
-  ) : null;
-}
+// function Thumbnail({ issue, onClick, page }) {
+//   const { thumbnail } = useFetchThumbnail(issue, page);
+//   return thumbnail ? (
+//     <img
+//       alt={`Thumbnail ${page}`}
+//       src={thumbnail}
+//       className="h-36 cursor-pointer"
+//       onClick={onClick}
+//     />
+//   ) : null;
+// }
 
 function Reader({ issue }) {
   const saveProgress = useSaveProgress(issue.id);
@@ -141,72 +141,84 @@ function Reader({ issue }) {
 
   return (
     <div>
-      {/* {currentPage && <img alt="" src={currentPage} />} */}
+      <div>
+        {/* {currentPage && <img alt="" src={currentPage} />} */}
 
-      {/* <div className="flex space-x-2">
-      {[...Array(issue?.pageCount || 0)].map((page, index) => (<Thumbnail key={`thumbnail-${index}`} issue={issue} page={index + 1} onClick={() => setPage(index + 1)} />))}
-    </div> */}
+        {/* <div className="flex space-x-2">
+          {[...Array(issue?.pageCount || 0)].map((page, index) => (
+            <Thumbnail
+              key={`thumbnail-${index}`}
+              issue={issue}
+              page={index + 1}
+              onClick={() => setPage(index + 1)}
+            />
+          ))}
+        </div> */}
 
-      <div
-        className="fixed z-10 inset-0 overflow-y-auto"
-        ref={viewerRef}
-        onClick={onClick}
-        onKeyUp={onKeyPress}
-        tabIndex={0}
-      >
-        <div className="flex items-end justify-center min-h-screen text-center">
-          <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-            <div className="absolute inset-0 bg-black"></div>
-          </div>
+        <div
+          className="fixed z-10 inset-0 overflow-y-auto"
+          ref={viewerRef}
+          onClick={onClick}
+          onKeyUp={onKeyPress}
+          tabIndex={0}
+        >
+          <div className="flex items-end justify-center min-h-screen text-center">
+            <div
+              className="fixed inset-0 transition-opacity"
+              aria-hidden="true"
+            >
+              <div className="absolute inset-0 bg-black"></div>
+            </div>
 
-          <span
-            className="hidden sm:inline-block sm:align-middle sm:h-screen"
-            aria-hidden="true"
-          >
-            &#8203;
-          </span>
+            <span
+              className="hidden sm:inline-block sm:align-middle sm:h-screen"
+              aria-hidden="true"
+            >
+              &#8203;
+            </span>
 
-          <div className="overflow-hidden h-screen w-screen relative flex">
-            {currentPage && (
-              <img
-                alt=""
-                src={currentPage}
-                className="max-h-screen max-w-screen m-auto select-none"
-              />
-            )}
-            {isOverlayActive && (
-              <div className="absolute top-0 left-0 mt-4 ml-4 w-full flex items-end">
-                <Icon
-                  icon="times"
-                  className="text-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  onClick={e => {
-                    e.stopPropagation();
-                    history.push(`/issue/${issue.id}/details`);
-                  }}
+            <div className="overflow-hidden h-screen w-screen relative flex">
+              {currentPage && (
+                <img
+                  alt=""
+                  src={currentPage}
+                  className="max-h-screen max-w-screen m-auto select-none"
                 />
-              </div>
-            )}
-            {isOverlayActive && (
-              <div className="bg-black bg-opacity-80 text-white p-2 absolute w-full bottom-0 z-40">
-                <div>
-                  <span>
-                    {issue ? (
-                      <>
-                        Page {page} / {issue.pageCount}
-                      </>
-                    ) : (
-                      '&nbsp;'
-                    )}
-                  </span>
+              )}
+              {isOverlayActive && (
+                <div className="absolute top-0 left-0 mt-4 ml-4 w-full flex items-end">
+                  <Icon
+                    icon="times"
+                    className="text-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    onClick={e => {
+                      e.stopPropagation();
+                      history.push(`/issue/${issue.id}/details`);
+                    }}
+                  />
                 </div>
-                <div
-                  className="bg-indigo-500 h-2 mt-2 rounded-sm"
-                  style={{
-                    width: `${(issue.currentPage / issue.pageCount) * 100}%`,
-                  }}
-                />
-              </div>
-            )}
+              )}
+              {isOverlayActive && (
+                <div className="bg-black bg-opacity-80 text-white p-2 absolute w-full bottom-0 z-40">
+                  <div>
+                    <span>
+                      {issue ? (
+                        <>
+                          Page {page} / {issue.pageCount}
+                        </>
+                      ) : (
+                        '&nbsp;'
+                      )}
+                    </span>
+                  </div>
+                  <div
+                    className="bg-indigo-500 h-2 mt-2 rounded-sm"
+                    style={{
+                      width: `${(issue.currentPage / issue.pageCount) * 100}%`,
+                    }}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

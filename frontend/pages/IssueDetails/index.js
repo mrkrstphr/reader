@@ -41,7 +41,7 @@ export default function IssueDetails() {
           {issue.hasCover ? (
             <img
               className="h-32 w-full object-cover lg:h-60 bg-gray-600"
-              src={`/issue/${issue.id}/page/1`}
+              src={`/assets/issue/${issue.id}/page/1`}
               alt=""
             />
           ) : (
@@ -55,7 +55,7 @@ export default function IssueDetails() {
                 <div className="relative">
                   <img
                     className="w-24 ring-4 ring-white h-auto sm:w-32"
-                    src={`/cover/${issue.id}`}
+                    src={`/assets/cover/${issue.id}`}
                     alt=""
                   />
                   {issue.currentPage > 1 && (
