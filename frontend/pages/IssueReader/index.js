@@ -33,6 +33,11 @@ function useFetchPages(issue, page) {
         .then(body => body.blob())
         .then(img => URL.createObjectURL(img))
         .then(setCurrentPage);
+
+      if (page + 1 <= issue.pageCount) {
+        // fetch the next page so it's cached for the next page load
+        fetch(`/assets/issue/${issue.id}/page/${page + 1}`);
+      }
     }
   }, [issue, page]);
 
