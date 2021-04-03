@@ -14,7 +14,9 @@ class AssetController
     {
         $issue = Issue::findOrFail($issueId);
         if (!empty($issue->cover_path)) {
-            return ImageResponse::makeFromPath($issue->cover_path);
+            return ImageResponse::makeFromPath($issue->cover_path)->withHeaders([
+                'Cache-control' => 'max-age=' . (60 * 60 * 24),
+            ]);
         }
 
         abort(404);
@@ -40,7 +42,9 @@ class AssetController
         $img->encode($img->mime, 90);
         $data = $img->getEncoded();
 
-        return ImageResponse::makeFromContents($data);
+        return ImageResponse::makeFromContents($data)->withHeaders([
+            'Cache-control' => 'max-age=' . (60 * 60 * 24),
+        ]);
     }
 
     public function fullPage(int $id, int $pageNum): Response
@@ -53,6 +57,8 @@ class AssetController
             abort(404);
         }
 
-        return ImageResponse::makeFromContents($page);
+        return ImageResponse::makeFromContents($page)->withHeaders([
+            'Cache-control' => 'max-age=' . (60 * 60 * 24),
+        ]);
     }
 }
