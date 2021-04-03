@@ -1,6 +1,9 @@
+import { debounce } from 'lodash';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { ClickOutside } from './components';
 import { Icon } from './Icon';
+import { useSearchIssues } from './query';
 
 function MenuLink({ children, href }) {
   return (
@@ -16,6 +19,94 @@ function MenuLink({ children, href }) {
 function MenuIcon({ icon }) {
   return (
     <Icon icon={icon} className="mr-3 h-6 w-6 text-indigo-300" fixedWidth />
+  );
+}
+
+function SearchResult({ issue, onClick }) {
+  return (
+    <div className="">
+      {/* {issue.hasCover ? (
+        <div className="relative">
+          <img
+            className="w-16 ring-4 ring-white h-auto"
+            src={`/assets/cover/${issue.id}`}
+            alt=""
+          />
+        </div>
+      ) : (
+        <div className="relative">
+          <div className="bg-gray-500 w-16 h-18 ring-4 ring-white" />
+        </div>
+      )} */}
+      <Link to={`/issue/${issue.id}/details`} onClick={onClick}>
+        {issue.title}
+      </Link>
+    </div>
+  );
+}
+
+function Search() {
+  const [query, setQuery] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+
+  const searchFunc = v => {
+    setIsOpen(true);
+    setQuery(v);
+  };
+  const onSearch = debounce(searchFunc, 600);
+
+  return (
+    <div className="flex-1 relative">
+      <ClickOutside onClickOutside={() => setIsOpen(false)}>
+        <form className="w-full flex md:ml-0 relative" action="#" method="GET">
+          <label htmlFor="headerSearch" className="sr-only">
+            Search
+          </label>
+          <div className="relative w-full text-gray-400 focus-within:text-gray-600">
+            <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none">
+              <Icon icon="search" className="h-5 w-5" />
+            </div>
+            <input
+              id="headerSearch"
+              className="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-0 focus:border-transparent sm:text-sm"
+              placeholder="Search"
+              type="search"
+              name="search"
+              onFocus={() => setIsOpen(true)}
+              onChange={e => onSearch(e.target.value)}
+            />
+          </div>
+        </form>
+
+        {query && query.length > 3 && isOpen && (
+          <SearchResults
+            onSelectResult={() => setIsOpen(false)}
+            query={query}
+          />
+        )}
+      </ClickOutside>
+    </div>
+  );
+}
+
+function SearchResults({ onSelectResult, query }) {
+  const { issues, loading } = useSearchIssues(query);
+
+  return (
+    <div className="absolute origin-top-right mt-5 right-0 left-0 bg-white shadow border rounded-sm p-4 flex flex-col space-y-2 max-h-96 overflow-y-auto">
+      {loading ? (
+        <span>LOADING...</span>
+      ) : (
+        issues.map(issue => (
+          <SearchResult
+            key={`search-result-${issue.id}`}
+            issue={issue}
+            onClick={onSelectResult}
+          />
+        ))
+      )}
+      {issues && issues.length === 0 && <div>No Results Found</div>}
+    </div>
   );
 }
 
@@ -153,26 +244,9 @@ export default function Layout({ children }) {
               onClick={() => setIsMobileMenuOpen(true)}
             />
           </button>
-          <div className="flex-1 px-4 flex justify-between">
-            <div className="flex-1 flex">
-              <form className="w-full flex md:ml-0" action="#" method="GET">
-                <label htmlFor="search_field" className="sr-only">
-                  Search
-                </label>
-                <div className="relative w-full text-gray-400 focus-within:text-gray-600">
-                  <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none">
-                    <Icon icon="search" className="h-5 w-5" />
-                  </div>
-                  <input
-                    id="search_field"
-                    className="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-0 focus:border-transparent sm:text-sm"
-                    placeholder="Search"
-                    type="search"
-                    name="search"
-                  />
-                </div>
-              </form>
-            </div>
+          <div className="flex-1 px-4 flex items-center justify-between">
+            <Search />
+
             <div className="ml-4 flex items-center md:ml-6">
               {/*<button className="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
             <span className="sr-only">View notifications</span>

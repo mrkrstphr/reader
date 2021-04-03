@@ -6,6 +6,7 @@ use App\GraphQL\Mutations\SaveReadingProgressMutation;
 use App\GraphQL\Queries\CurrentlyReadingQuery;
 use App\GraphQL\Queries\IssueDetailsQuery;
 use App\GraphQL\Queries\RecentlyAddedIssuesQuery;
+use App\GraphQL\Queries\SearchIssuesQuery;
 use App\GraphQL\Types\IssueType;
 
 return [
@@ -71,6 +72,7 @@ return [
                 'currentlyReading' => CurrentlyReadingQuery::class,
                 'issue' => IssueDetailsQuery::class,
                 'recentlyAddedIssues' => RecentlyAddedIssuesQuery::class,
+                'searchIssues' => SearchIssuesQuery::class,
             ],
             'mutation' => [
                 'saveReadingProgress' => SaveReadingProgressMutation::class,
