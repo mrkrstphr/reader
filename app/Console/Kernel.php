@@ -25,7 +25,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command(Scan::class)->everyFifteenMinutes();
+        $schedule
+            ->command(Scan::class)
+            ->everyFifteenMinutes()
+            ->withoutOverlapping();
     }
 
     /**

@@ -56,13 +56,7 @@ class Scan extends Command
         DB::beginTransaction();
 
         foreach ($rii as $file) {
-
-            if ($file->isDir()){
-                continue;
-            }
-
-            if (!in_array(strtolower($file->getExtension()), SUPPORTED_TYPES)) {
-                // TODO FIXME log
+            if ($file->isDir()) {
                 continue;
             }
 
@@ -70,6 +64,8 @@ class Scan extends Command
             if ($issue) {
                 continue;
             }
+
+            echo "-- Processing file: [$file->getPathname()]\n";
 
             $issue = new Issue();
             $issue->path = $file->getPathname();
@@ -83,6 +79,7 @@ class Scan extends Command
 
             $zip = new \ZipArchive();
             if (!$zip->open($file->getPathname())) {
+                echo "---- Failed to open file, skipping...\n";
                 // TODO FIXME error report, something
                 continue;
             }
@@ -127,15 +124,13 @@ class Scan extends Command
                 $issue->cover_path = $storageFileName;
                 $issue->page_count = count($relevantFiles);
                 $issue->save();
-
             }
-        }
 
+            echo "---- done!\n";
+        }
 
         DB::commit();
 
-        // echo "Scanning the computer files...\n";
-        // var_dump($files);
         return 0;
     }
 }
