@@ -2,6 +2,7 @@ import { gql, useMutation, useQuery } from '@apollo/client';
 import { isNil } from 'lodash';
 import React, { useEffect, useRef, useState } from 'react';
 import { useHistory, useParams } from 'react-router';
+import { useSwipeable } from 'react-swipeable';
 import { Icon } from '../../Icon';
 
 const fetchIssueDetails = gql`
@@ -97,6 +98,12 @@ function Reader({ issue }) {
   const { currentPage } = useFetchPages(issue, page);
   const viewerRef = useRef(null);
   const history = useHistory();
+  const handlers = useSwipeable({
+    onSwipedLeft: () => setPage(Math.min(page + 1, issue.pageCount)),
+    onSwipedRight: () => setPage(Math.max(1, page - 1)),
+    preventDefaultTouchmoveEvent: true,
+  });
+  const [isFullScreen, toggleIsFullScreen] = useFullScreen();
 
   useEffect(() => {
     if (viewerRef.current) {
@@ -182,7 +189,10 @@ function Reader({ issue }) {
               &#8203;
             </span>
 
-            <div className="overflow-hidden h-screen w-screen relative flex">
+            <div
+              className="overflow-hidden h-screen w-screen relative flex"
+              {...handlers}
+            >
               {currentPage && (
                 <img
                   alt=""
@@ -194,7 +204,7 @@ function Reader({ issue }) {
                 <div className="absolute top-0 left-0 mt-4 ml-4 w-full flex items-end">
                   <Icon
                     icon="times"
-                    className="text-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="text-white text-2xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     onClick={e => {
                       e.stopPropagation();
                       history.push(`/issue/${issue.id}/details`);
@@ -204,8 +214,8 @@ function Reader({ issue }) {
               )}
               {isOverlayActive && (
                 <div className="bg-black bg-opacity-80 text-white p-2 absolute w-full bottom-0 z-40">
-                  <div>
-                    <span>
+                  <div className="flex space-x-2 items-center">
+                    <div className="flex-1 text-center">
                       {issue ? (
                         <>
                           Page {page} / {issue.pageCount}
@@ -213,7 +223,16 @@ function Reader({ issue }) {
                       ) : (
                         '&nbsp;'
                       )}
-                    </span>
+                    </div>
+                    <div>
+                      <Icon
+                        icon={isFullScreen ? 'compress' : 'expand'}
+                        onClick={e => {
+                          e.stopPropagation();
+                          toggleIsFullScreen();
+                        }}
+                      />
+                    </div>
                   </div>
                   <div
                     className="bg-indigo-500 h-2 mt-2 rounded-sm"
@@ -229,6 +248,39 @@ function Reader({ issue }) {
       </div>
     </div>
   );
+}
+
+function useFullScreen() {
+  const [isFullScreen, setIsFullScreen] = React.useState(
+    !isNil(document.fullscreenElement)
+  );
+
+  function onFullScreenChanged() {
+    if (document.fullscreenElement) {
+      setIsFullScreen(true);
+    } else {
+      setIsFullScreen(false);
+    }
+  }
+
+  useEffect(() => {
+    document.addEventListener('fullscreenchange', onFullScreenChanged);
+
+    return () =>
+      document.removeEventListener('fullscreenchange', onFullScreenChanged);
+  }, [onFullScreenChanged]);
+
+  function toggleFullScreen() {
+    if (!isFullScreen) {
+      document.documentElement.requestFullscreen();
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  }
+
+  return [isFullScreen, toggleFullScreen];
 }
 
 export default function IssueReaderPage() {
