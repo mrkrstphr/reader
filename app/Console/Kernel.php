@@ -2,7 +2,8 @@
 
 namespace App\Console;
 
-use App\Console\Commands\Scan;
+use App\Console\Commands\Scan as ScanCommand;
+use App\Console\Crons\Scan as ScanCron;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -14,7 +15,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        ScanCommand::class,
     ];
 
     /**
@@ -25,8 +26,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule
-            ->command(Scan::class)
+        $schedule->call(new ScanCron)
+            ->name('scan')
             ->everyFifteenMinutes()
             ->withoutOverlapping();
     }
